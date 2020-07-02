@@ -8,13 +8,44 @@
 
 import Foundation
 
-struct MemoryGame <CardContent> {
+struct MemoryGame <CardContent> where CardContent: Equatable {
     var cards: Array<Card>
+    
+    var indexOfTheOneAndOnlyFaceUpCard: Int? {
+        get{
+            cards.indices.filter { cards[$0].isFaceUp }.only
+//            for index in cards.indices{
+//                if cards[index].isFaceUp{
+//                    faceUpCardIndices.append(index)
+//                }
+//            }
+//            if faceUpCardIndices.count == 1{
+//                return faceUpCardIndices.first
+//            }else{
+//                return nil
+//            }
+        }
+        set{
+            for index in cards.indices{
+                cards[index].isFaceUp = index == newValue
+            }
+        }
+    }
     
     mutating func choose(card: Card) {
         print("card chosen: \(card)")
-        let chosenIndex: Int = self.index(of: card)
-        self.cards[chosenIndex].isFaceUp = !self.cards[chosenIndex].isFaceUp
+        if let chosenIndex: Int = cards.firstIndex(matching: card), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMathched {
+            if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard{
+                if cards[chosenIndex].content == cards[potentialMatchIndex].content{
+                    cards[chosenIndex].isMathched = true
+                    cards[potentialMatchIndex].isMathched = true
+                }
+                indexOfTheOneAndOnlyFaceUpCard = nil
+            }else{
+
+                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
+            }
+        }
     }
     
     func index(of card: Card) -> Int {
@@ -23,6 +54,7 @@ struct MemoryGame <CardContent> {
                 return index
             }
         }
+        // TODO: bogus
         return 0
     }
     

@@ -16,6 +16,7 @@ struct EmojiMemoryGameView: View {
             CardView(card: card).onTapGesture {
                 self.viewModel.choose(card: card)
             }
+            .padding(5)
         }
         .padding()
         .foregroundColor(Color.orange)
@@ -26,7 +27,6 @@ struct EmojiMemoryGameView: View {
 
 struct CardView: View {
     var card: MemoryGame<String>.Card
-    
     var body: some View{
         GeometryReader{ geometry in
             self.body(for: geometry.size)
@@ -41,9 +41,11 @@ struct CardView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.orange, lineWidth: 3)
                 Text(card.content)
-            }else{
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill()
+            } else {
+                if !card.isMathched {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill()
+                }
             }
         }
         .font(Font.system(size: fortSize(for: size)))
