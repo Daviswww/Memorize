@@ -40,7 +40,7 @@ struct MemoryGame <CardContent> where CardContent: Equatable {
                     cards[chosenIndex].isMathched = true
                     cards[potentialMatchIndex].isMathched = true
                 }
-                indexOfTheOneAndOnlyFaceUpCard = nil
+                self.cards[chosenIndex].isFaceUp = true
             }else{
 
                 indexOfTheOneAndOnlyFaceUpCard = chosenIndex
