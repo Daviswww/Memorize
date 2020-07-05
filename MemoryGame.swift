@@ -65,12 +65,65 @@ struct MemoryGame <CardContent> where CardContent: Equatable {
             cards.append(Card(content: content, id: pairIndex*2))
             cards.append(Card(content: content, id: pairIndex*2+1))
         }
+        cards.shuffle()
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = false
-        var isMathched: Bool = false
+        var isFaceUp: Bool = false {
+            didSet{
+                if isFaceUp{
+                    startUsingBonusTime()
+                }else{
+                    stopUsingBonusTime()
+                }
+            }
+        }
+        var isMathched: Bool = false {
+            didSet {
+                stopUsingBonusTime()
+            }
+        }
         var content: CardContent
         var id: Int
+        
+        // MARK: - Bonus Time
+        
+        var bonusTimeLimit: TimeInterval = 6
+        var lastFaceUpDate: Date?
+        var pastFaceUpTime: TimeInterval = 0
+        
+        private var faceUpTime: TimeInterval {
+            if let lastFaceUpDate = self.lastFaceUpDate{
+                return pastFaceUpTime + Date().timeIntervalSince(lastFaceUpDate)
+            }else{
+                return pastFaceUpTime
+            }
+        }
+        
+        var bonusTimeRemaining: TimeInterval {
+            max(0, bonusTimeLimit - faceUpTime)
+        }
+        
+        var bonusRemaining: Double {
+            (bonusTimeLimit > 0 && bonusTimeRemaining > 0 ) ? bonusTimeRemaining / bonusTimeLimit : 0
+        }
+        
+        var hasEarnedBonus: Bool{
+            isMathched && bonusRemaining > 0
+        }
+        
+        var isConsumingBonustime: Bool {
+            isFaceUp && !isMathched && bonusRemaining > 0
+        }
+        
+        private mutating func startUsingBonusTime(){
+            pastFaceUpTime = faceUpTime
+            self.lastFaceUpDate = nil
+        }
+        
+        private mutating func stopUsingBonusTime(){
+            pastFaceUpTime = faceUpTime
+            self.lastFaceUpDate = nil
+        }
     }
 }
